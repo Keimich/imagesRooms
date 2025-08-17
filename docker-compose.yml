@@ -1,0 +1,32 @@
+services:
+  # Serviço da Aplicação Node.js
+  app:
+    # Constrói a imagem a partir do Dockerfile no diretório atual
+    build: .
+    container_name: whiteboard_app
+    ports:
+      # Mapeia a porta 3000 do contêiner para a porta 3000 da máquina host
+      - "3000:3000"
+    environment:
+      # A aplicação se conectará ao serviço 'redis' na porta padrão 6379
+      - REDIS_URL=redis://redis:6379
+      - PORT=3000
+    # Garante que o serviço 'redis' seja iniciado antes do serviço 'app'
+    depends_on:
+      - redis
+
+  # Serviço do Banco de Dados Redis
+  redis:
+    # Usa a imagem oficial do Redis com base no Alpine Linux (menor)
+    image: "redis:alpine"
+    container_name: redis_server
+    ports:
+      # Expõe a porta do Redis para a máquina host (útil para debug)
+      - "6379:6379"
+    volumes:
+      # Cria um volume nomeado para persistir os dados do Redis
+      - redis-data:/data
+
+# Define os volumes nomeados utilizados nos serviços
+volumes:
+  redis-data:
